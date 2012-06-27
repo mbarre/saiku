@@ -56,14 +56,15 @@ public class SaikuMondrianHelper {
 		return (con instanceof MondrianOlap4jConnection);
 	}
 
-	public static void setRoles(OlapConnection con, String[] roleNames) throws Exception {
+	public static boolean setRoles(OlapConnection con, String[] roleNames) throws Exception {
 		if (!(con instanceof MondrianOlap4jConnection)) {
 			throw new IllegalArgumentException("Connection has to be instance of MondrianOlap4jConnection");
 		}
-		if (roleNames == null) {
+		if (roleNames == null || roleNames.length == 0) {
 			con.setRoleName(null);
-			return;
+			return false; //Not role info, authentication failed
 		}
+		
 		MondrianOlap4jConnection mcon = (MondrianOlap4jConnection) con;
 		RolapConnection rcon = getMondrianConnection(mcon);
 		Schema schema = rcon.getSchema();
@@ -89,6 +90,12 @@ public class SaikuMondrianHelper {
 			break;
 		}
 		rcon.setRole(role);
+		
+		//Check if user had some granted role
+		if(roleList.size() == 0)
+			return false;
+		else 
+			return true;
 	}
 
 }

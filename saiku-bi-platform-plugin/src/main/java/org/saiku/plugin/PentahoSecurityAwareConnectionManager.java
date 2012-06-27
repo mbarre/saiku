@@ -117,6 +117,10 @@ public class PentahoSecurityAwareConnectionManager extends AbstractConnectionMan
 				if (setRole(con, validMondrianRolesForUser, datasource)) {
 					return con;
 				}
+				else{ 
+					con = null; //set connection to null to hide datasource
+					System.out.println("Hide datasource "+datasource.getName()+" for current user.");//added by Infocentre
+				}				
 			}
 		}
 
@@ -128,10 +132,10 @@ public class PentahoSecurityAwareConnectionManager extends AbstractConnectionMan
 		if (con.getConnection() instanceof OlapConnection) 
 		{
 			OlapConnection c = (OlapConnection) con.getConnection();
-			System.out.println("Setting role to datasource:" + datasource.getName() + " role:" + validMondrianRolesForUser);
+			System.out.println("Setting role to datasource:" + datasource.getName() + " role:" + (validMondrianRolesForUser == null || validMondrianRolesForUser.length == 0? "" : validMondrianRolesForUser[0]));
 			try {
-				SaikuMondrianHelper.setRoles(c, validMondrianRolesForUser);
-				return true;
+				boolean res = SaikuMondrianHelper.setRoles(c, validMondrianRolesForUser);
+				return res;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
